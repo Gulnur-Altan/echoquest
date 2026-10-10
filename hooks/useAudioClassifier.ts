@@ -200,7 +200,6 @@ export function useAudioClassifier({
             const audioData = resampled.getChannelData(0);
 
             const predictions = (await classifier(audioData, {
-                sampling_rate: targetRate,
                 top_k: 5,
             })) as Prediction[];
 

@@ -15,6 +15,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "EchoQuest",
   description: "Discover the hidden sounds of nature with EchoQuest. Record, analyze, and explore the natural world around you.",
+  icons: {
+    icon: [{
+      url: "/images/favicon-echo.png",
+      href: "/images/favicon-echo.png",
+    }
+    ]
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
