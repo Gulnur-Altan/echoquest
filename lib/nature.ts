@@ -15,6 +15,26 @@ export function getNatureInsight(label: string): NatureInsight {
   const sound = label.toLowerCase();
 
   if (
+    sound.includes("dog") ||
+    sound.includes("bark") ||
+    sound.includes("woof") ||
+    sound.includes("puppy") ||
+    sound.includes("cat") ||
+    sound.includes("meow") ||
+    sound.includes("kitten") ||
+    sound.includes("purr")
+  ) {
+    return {
+      isNature: true,
+      category: "Animal Sounds",
+      title: "🐾 Animal sound detected!",
+      message:
+        "Animals add their own unique sounds to the world around us. Keep listening and exploring!",
+      points: 5,
+    };
+  }
+
+  if (
     sound.includes("bird") ||
     sound.includes("chirp")
   ) {
