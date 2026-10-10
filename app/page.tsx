@@ -11,12 +11,10 @@ const MODEL = "Xenova/ast-finetuned-audioset-10-10-0.4593";
 
 export default function Home() {
   //state variables
-    const [history, setHistory] = useState<Discovery[]>([]);
+  const [history, setHistory] = useState<Discovery[]>([]);
   const [historyLoaded, setHistoryLoaded] = useState(false);
 
-  const natureDiscoveries = history.filter(
-    (item) => item.points > 0
-  ).length;
+  const natureDiscoveries = history.filter((item) => item.points > 0).length;
 
   const {
     status,
@@ -84,6 +82,9 @@ export default function Home() {
           <p className="mt-2 text-stone-300">
             Find a quiet spot. Record 5–10 seconds of the world around you.
           </p>
+          <p role="status" aria-live="polite">
+            {status}
+          </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
             {!recording ? (
@@ -121,11 +122,12 @@ export default function Home() {
           )}
         </section>
 
-        {results.length > 0 && (
-         <SoundResults results={results} />
-        )}
+        {results.length > 0 && <SoundResults results={results} />}
 
-        <NatureJournal history={history} />
+        <NatureJournal
+          history={history}
+          onClearHistory={() => setHistory([])}
+        />
         <BadgePanel natureDiscoveries={natureDiscoveries} />
 
         <footer className="mt-10 text-center text-xs text-stone-500">

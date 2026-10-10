@@ -26,6 +26,9 @@ export function useAudioClassifier({
     const recorder = useRef<MediaRecorder | null>(null);
     const chunks = useRef<Blob[]>([]);
     const streamRef = useRef<MediaStream | null>(null);
+    const recordingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null
+    );
 
     useEffect(() => {
         return () => {
@@ -46,10 +49,24 @@ export function useAudioClassifier({
 
     }, []);
 
+
     async function startRecording() {
+        if (recordingTimerRef.current !== null) {
+            clearTimeout(recordingTimerRef.current);
+            recordingTimerRef.current = null;
+        }
+
         try {
             setResults([]);
-            setStatus("Listening to nature...");
+            setStatus("Requesting microphone access...");
+
+            if (!navigator.mediaDevices?.getUserMedia) {
+                setStatus(
+                    "Microphone access is unavailable. Please use HTTPS or localhost."
+                );
+                setRecording(false);
+                return;
+            }
 
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: true,
@@ -68,31 +85,75 @@ export function useAudioClassifier({
             };
 
             mediaRecorder.onstop = () => {
+                setRecording(false);
+
+                if (recordingTimerRef.current !== null) {
+                    clearTimeout(recordingTimerRef.current);
+                    recordingTimerRef.current = null;
+                }
+
                 const blob = new Blob(chunks.current, {
                     type: mediaRecorder.mimeType,
                 });
 
-                setAudioUrl(URL.createObjectURL(blob));
+                if (blob.size > 0) {
+                    setAudioUrl(URL.createObjectURL(blob));
+                    setStatus("Recording ready. Analyze your discovery!");
+                } else {
+                    setStatus("No audio recorded. Please try again.");
+                }
 
                 stream.getTracks().forEach((track) => track.stop());
                 streamRef.current = null;
-
-                setStatus("Recording ready. Analyze your discovery!");
             };
 
             mediaRecorder.start();
-            setRecording(true);
-        } catch (error) {
-            setStatus("Microphone access failed. Please allow microphone access.");
-            console.error(error);
-        }
 
+            setRecording(true);
+            setStatus("Listening to nature...");
+
+            recordingTimerRef.current = setTimeout(() => {
+                if (mediaRecorder.state === "recording") {
+                    mediaRecorder.stop();
+                }
+            }, 15_000);
+        }
+        catch (error: unknown) {
+            console.error("Microphone access error:", error);
+
+            setRecording(false);
+
+            if (
+                error instanceof DOMException &&
+                error.name === "NotAllowedError"
+            ) {
+                setStatus(
+                    "🎙️ Microphone access denied. Please allow microphone access in your browser settings and try again."
+                );
+            } else if (
+                error instanceof DOMException &&
+                error.name === "NotFoundError"
+            ) {
+                setStatus(
+                    "🎤 No microphone found. Please connect a microphone and try again."
+                );
+            } else {
+                setStatus(
+                    "⚠️ Could not start recording. Please check your microphone and try again."
+                );
+            }
+        }
     }
+
 
     function stopRecording() {
         if (recorder.current?.state === "recording") {
             recorder.current.stop();
             setRecording(false);
+        }
+        if (recordingTimerRef.current !== null) {
+            clearTimeout(recordingTimerRef.current);
+            recordingTimerRef.current = null;
         }
     }
 
