@@ -6,8 +6,7 @@ import NatureJournal from "./components/NatureJournal";
 import type { Discovery } from "../lib/types";
 import { useAudioClassifier } from "../hooks/useAudioClassifier";
 import SoundResults from "./components/SoundResults";
-
-const MODEL = "Xenova/ast-finetuned-audioset-10-10-0.4593";
+import DiscoveryHero from "./components/DiscoveryHero";
 
 export default function Home() {
   //state variables
@@ -58,84 +57,40 @@ export default function Home() {
     localStorage.setItem("echoquest-history", JSON.stringify(history));
   }, [history, historyLoaded]);
 
-  return (
-    <main className="min-h-screen bg-[#101910] px-5 py-12 text-[#f0f4e8]">
-      <section className="mx-auto max-w-2xl">
-        <p className="text-sm uppercase tracking-[0.3em] text-lime-300">
-          Outdoor discovery
-        </p>
+return (
+  <main className="min-h-screen bg-[#111B15] px-4 py-8 text-[#f0f4e8] sm:px-6 sm:py-12">
+    <div className="pointer-events-none fixed inset-0 -z-0 bg-[radial-gradient(ellipse_at_top,_rgba(67,105,49,0.12),transparent_55%)]" />
 
-        <h1 className="mt-4 text-5xl font-black tracking-tight">
-          EchoQuest<span className="text-lime-300"></span>
-        </h1>
+    <section className="relative z-10 mx-auto max-w-3xl">
+      <DiscoveryHero
+        status={status}
+        recording={recording}
+        busy={busy}
+        audioUrl={audioUrl}
+        startRecording={startRecording}
+        stopRecording={stopRecording}
+        analyzeSound={analyzeSound}
+      />
 
-        <p className="mt-4 max-w-lg leading-7 text-stone-300">
-          Step outside. Listen closely. Discover the sounds hiding in the world
-          around you.
-        </p>
-
-        <section className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6">
-          <div className="text-5xl">🌿</div>
-
-          <h2 className="mt-4 text-2xl font-bold">Your first discovery</h2>
-
-          <p className="mt-2 text-stone-300">
-            Find a quiet spot. Record 5–10 seconds of the world around you.
-          </p>
-          <p role="status" aria-live="polite">
-            {status}
-          </p>
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            {!recording ? (
-              <button
-                onClick={startRecording}
-                disabled={busy}
-                className="rounded-full bg-lime-300 px-6 py-3 font-bold text-[#101910] disabled:opacity-50"
-              >
-                🎙 Start listening
-              </button>
-            ) : (
-              <button
-                onClick={stopRecording}
-                className="rounded-full bg-red-400 px-6 py-3 font-bold text-black"
-              >
-                ■ Stop recording
-              </button>
-            )}
-
-            <button
-              onClick={analyzeSound}
-              disabled={!audioUrl || busy || recording}
-              className="rounded-full border border-lime-300 px-6 py-3 font-bold text-lime-200 disabled:opacity-40"
-            >
-              {busy ? "Analyzing..." : "✨ Analyze sound"}
-            </button>
-          </div>
-
-          <p role="status" className="mt-5 text-sm text-lime-200">
-            {status}
-          </p>
-
-          {audioUrl && (
-            <audio className="mt-4 w-full" controls src={audioUrl} />
-          )}
-        </section>
-
-        {results.length > 0 && <SoundResults results={results} />}
+      <div className="mt-8 space-y-6">
+        {results.length > 0 && (
+          <SoundResults results={results} />
+        )}
 
         <NatureJournal
           history={history}
           onClearHistory={() => setHistory([])}
         />
-        <BadgePanel natureDiscoveries={natureDiscoveries} />
 
-        <footer className="mt-10 text-center text-xs text-stone-500">
-          Your recording is analyzed in your browser.
-          <br />
-          Model files are downloaded on first use.
-        </footer>
-      </section>
-    </main>
-  );
+        <BadgePanel natureDiscoveries={natureDiscoveries} />
+      </div>
+
+      <footer className="mt-10 text-center text-xs leading-6 text-stone-500">
+        Your recording is analyzed in your browser.
+        <br />
+        Model files are downloaded on first use.
+      </footer>
+    </section>
+  </main>
+);
 }
