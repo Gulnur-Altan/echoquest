@@ -11,6 +11,8 @@ export type NatureInsight = {
   points: number;
 };
 
+const MIN_CONFIDENCE = 0.5;
+
 export function getNatureInsight(label: string): NatureInsight {
   const sound = label.toLowerCase();
 
@@ -108,6 +110,7 @@ export function getNatureInsight(label: string): NatureInsight {
 
 export function getBestNatureMatch(predictions: Prediction[]) {
   return predictions
+    .filter((prediction) => prediction.score >= MIN_CONFIDENCE)
     .map((prediction) => ({
       prediction,
       insight: getNatureInsight(prediction.label),

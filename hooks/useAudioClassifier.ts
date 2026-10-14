@@ -214,9 +214,13 @@ export function useAudioClassifier({
                     points: natureMatch.insight.points,
                     time: new Date().toLocaleTimeString(),
                 });
-            }
 
-            setStatus("Discovery complete!");
+                setStatus("Nature discovery found! You earned XP.");
+            } else {
+                setStatus(
+                    "No confident nature match found. Try recording the sound again."
+                );
+            }
         } catch (error) {
             console.error(error);
             setStatus(
